@@ -1,13 +1,33 @@
-import { createTask } from './services/taskServices.js';
+import { getTasks, createTask, deleteTask } from './services/taskServices.js';
 
 const createButton = document.querySelector('#create-task-button');
+const deleteButtons = document.querySelectorAll('.delete-task-button');
 
 document.addEventListener("DOMContentLoaded",  () => {
     const tasks = JSON.parse(sessionStorage.getItem('Tasks'));
-
+    
     tasks.forEach(e => {
         createHTMLTask([e.title, e.description, e.date, e.status]);
     });
+    
+    //getTasks(tasks);
+});
+
+document.addEventListener('click', async (event) => {
+    if(event.target.classList.contains('delete-task-button')) {
+        const parentDiv = event.target.parentElement;
+        const title = parentDiv.querySelector('h3');
+
+        try {
+            console.log(title);
+            const response = await deleteTask(title);
+            console.log(response);
+            event.target.parentElement.remove();
+
+        } catch (error) {
+            console.error('[ERROR] Error deleting task. ', error);
+        }
+    }
 });
 
 createButton.addEventListener('click', async () => {

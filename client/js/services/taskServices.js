@@ -1,5 +1,14 @@
 const BASE_URL = 'http://localhost:3000/tasks';
 
+export async function getTasks(tasks) {
+    try {
+        const res = await fetch(BASE_URL);
+        return res;
+    } catch (error) {
+        console.error('[ERROR] Error gettinf tasks info. ', error);
+    }
+}
+
 export async function createTask(title, desc, date, status) {
     const postData = {
         title,
@@ -30,5 +39,27 @@ export async function createTask(title, desc, date, status) {
     } catch (error) {
         console.error('[ERROR] Error in the Task creation request . ', error);
     }
-    
+}
+
+export async function deleteTask(title) {
+    try {
+        const tasks = JSON.parse(sessionStorage.getItem('Tasks'));
+        tasks.forEach(task => {
+            console.log(task);
+        });
+        console.log(title);
+        const deletedTask = tasks.filter(task => task.title.toLowerCase() === title.textContent.toLowerCase());
+        const otherTasks = tasks.filter(task => task.title.toLowerCase() !== title.textContent.toLowerCase());
+        console.log('Tarea a eliminar: ',deletedTask);
+        console.log(otherTasks);
+        sessionStorage.setItem('Tasks', JSON.stringify(otherTasks));
+
+        const res = await fetch(BASE_URL, {
+            method: 'DELETE'
+        });
+        return res;
+    } catch (error) {
+        console.error('[ERROR] Error deleting the task request . ', error);
+    }
+   
 }
