@@ -12,10 +12,11 @@ app.use(express.json());
 app.use(cors()); 
   
 app.get('/', (req, res, next) => {
-    next.redirect('/tasks')
+    console.log('------------------------------///////////////////////////////----------------------------');
+    res.redirect('/tasks');
 });
 app.use('/tasks', taskRoutes);     
-app.use('/events', eventRoutes); 
+//app.use('/events', eventRoutes); 
 
 app.use(notFoundHandler);
 app.use(errorHandler);

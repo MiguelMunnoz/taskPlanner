@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Planner</title>
+    <link rel="stylesheet" href="./css/index.css">
+    <script type="module" src="./js/task.js" defer></script>
+</head>
+<body>
+
+    <header class="header">
+        <p>Header</p>
+    </header>
+
+    <section class="main">
+        <aside class="sidebar">
+            <div class="taskForm">
+                <h3>Create Your Task!</h3>
+                <div class="input-div">
+                    <label for="title-input">Title</label>
+                    <input type="text" id="title-input" class="input">
+                </div>
+                <div class="input-div">
+                    <label for="description-input">Description</label>
+                    <input type="text" id="description-input" class="input">
+                </div>
+                <div class="input-div">
+                    <label for="date-input">Date</label>
+                    <input type="date" id="date-input" class="input">
+                </div>
+                <div class="input-div">
+                    <label for="options">Status</label>
+                    <select id="status-input" name="options" class="input">
+                        <option value="pending">Pending</option>
+                        <option value="in progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                
+                <button id="create-task-button">Create Task</button>
+            </div>
+        </aside>
+        <section class="main-content">
+            <div class="main-content-taskContainer">
+                
+            </div>
+
+        </section>
+    </section>
+</body>
+</html>
