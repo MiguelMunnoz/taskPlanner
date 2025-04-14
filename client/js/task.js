@@ -43,6 +43,10 @@ function createHTMLTask(elementList) {
         newElement.textContent = e;
         newDiv.appendChild(newElement);
     });
+    const delButton = document.createElement('button');
+    delButton.textContent = 'X';
+    delButton.classList.add('delete-task-button');
+    newDiv.appendChild(delButton);
     
     newDiv.classList.add('task');
     taskContainer.appendChild(newDiv);

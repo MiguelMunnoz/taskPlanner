@@ -87,10 +87,33 @@ body {
 .task {
     display: flex;
     flex-direction: column;
+
+    position: relative;
     background-color: #00abe4;
     border: 2px solid #00abe4;
     border-radius: 8px;
     width: 100%;
+}
+
+.delete-task-button {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    border: none;
+    background: crimson;
+    color: white;
+    border-radius: 24%;
+    width: 32px;
+    height: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    /*line-height: 24px;*/
+    /*text-align: center;*/
+    z-index: 10; /* Por si acaso hay overlays o padding */
+}
+
+.delete-task-button:hover {
+    scale: 1.1;
 }
 
 @media (max-width: 1024px) {
