@@ -5,7 +5,6 @@ const taskController = {
         async (req, res) => {
             try {
                 const data = 'Bienvenido a tasks';
-                //const data = sessionStorage.getItem('Tasks');
                 res.status(200).json(data);
             } catch (error) {
                 console.log('[ERROR] Error getting task info. ', error);
@@ -18,7 +17,6 @@ const taskController = {
         async (req, res) => {
             try {
                 const data = req.body;
-                console.log('INFO:');
                 console.log(data);
                 res.status(201).json(data);
             } catch (error) {

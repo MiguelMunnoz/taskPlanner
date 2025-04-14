@@ -18,7 +18,15 @@ export async function createTask(title, desc, date, status) {
         }
         
         sessionStorage.setItem('Tasks', JSON.stringify(tasks));
-        return postData;
+        console.log('Task saved in sessionStorage.', postData);
+
+        const res = await fetch(BASE_URL, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(postData)
+        });
+
+        return res;
     } catch (error) {
         console.error('[ERROR] Error in the Task creation request . ', error);
     }

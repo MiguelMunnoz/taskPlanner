@@ -108,5 +108,9 @@ body {
         align-items: center;
     }
 
+    .main-content {
+        box-sizing: border-box;
+    }
+
 }
 
