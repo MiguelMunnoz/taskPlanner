@@ -110,8 +110,8 @@ body {
 
 .delete-task-button {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 0.5rem;
+    right: 0.5rem;
     border: none;
     background: crimson;
     color: white;
@@ -126,6 +126,39 @@ body {
 .delete-task-button:hover {
     scale: 1.1;
 }
+
+.edit-task-button {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    background-color: #ffc107;
+    border: none;
+    color: black;
+    font-weight: bold;
+    border-radius: 24%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+  }
+
+.edit-task-button:hover {
+    scale: 1.1;
+}
+
+.task input, .task select {
+  width: 85%;
+  padding: 6px;
+  margin: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid black;
+  
+  font-family: inherit;
+  font-size: inherit;
+  
+  box-sizing: border-box;
+}
+
+
 
 @media (max-width: 1024px) {
     .main {
