@@ -1,4 +1,5 @@
 const BASE_URL = 'http://localhost:3000/tasks';
+let taskID = 0;
 
 export async function getTasks(tasks) {
     try {
@@ -17,10 +18,15 @@ export async function createTask(title, desc, date, status) {
         status
     };
 
+    taskID += 1;
+    postData.taskID = taskID;
+
     try {
         let tasks = JSON.parse(sessionStorage.getItem('Tasks'));
+         
 
         if(tasks) {
+            
             tasks.push(postData);    
         } else {
             tasks = [postData];
@@ -35,7 +41,8 @@ export async function createTask(title, desc, date, status) {
             body: JSON.stringify(postData)
         });
 
-        return res;
+        const data = await res.json();
+        return data;
     } catch (error) {
         console.error('[ERROR] Error in the Task creation request . ', error);
     }
@@ -53,6 +60,15 @@ export async function deleteTask(title) {
         return res;
     } catch (error) {
         console.error('[ERROR] Error deleting the task request . ', error);
+    }  
+}
+
+export async function updateTask(id, updatedData) {
+    try {
+        const tasks = JSON.parse(sessionStorage.getItem('Tasks'));
+        const updatedTask = tasks.filter(task => task.taskID === id);
+        console.log(updatedTask);
+    } catch (error) {
+        console.error('[ERROR] Error updating the task request . ', error);
     }
-   
 }

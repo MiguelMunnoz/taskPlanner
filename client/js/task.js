@@ -1,4 +1,4 @@
-import { getTasks, createTask, deleteTask } from './services/taskServices.js';
+import { getTasks, createTask, deleteTask, updateTask } from './services/taskServices.js';
 
 const createButton = document.querySelector('#create-task-button');
 
@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded",  () => {
     const tasks = JSON.parse(sessionStorage.getItem('Tasks'));
     if(tasks) {
         tasks.forEach(e => {
-            createHTMLTask([e.title, e.description, e.date, e.status]);
+            createHTMLTask(e.taskID, [e.title, e.description, e.date, e.status]);
         });
     }
     //getTasks(tasks);
@@ -30,8 +30,9 @@ createButton.addEventListener('click', async () => {
     try {
         const response = await createTask(title.value, description.value, date.value, status.value);
         console.log('Client response: ', response);
+
         if(response) {
-            createHTMLTask([title.value, description.value, date.value, status.value]);
+            createHTMLTask(response.taskID, [response.title, response.description, response.date, response.status]);
         }
         
     } catch (error) {
@@ -39,7 +40,7 @@ createButton.addEventListener('click', async () => {
     }
 });
 
-function createHTMLTask(elementList) {
+function createHTMLTask(id, elementList) {
     const taskContainer = document.querySelector('.main-content-taskContainer');
     const newDiv = document.createElement('div');
 
@@ -52,11 +53,15 @@ function createHTMLTask(elementList) {
     delButton.classList.add('delete-task-button');
     editButton.classList.add('edit-task-button');
 
+    const newId = document.createElement('span');
+    newId.classList.add('hidden');
+    newDiv.appendChild(newId);
+
     elementList.forEach((e, i) => {
         let newElement;
-        
+
         if(i === 0) {
-            newElement = document.createElement(`h3`);
+            newElement = document.createElement('h3');
             newElement.classList.add('task-title');
         } else {
             newElement = document.createElement(`p`);
@@ -75,7 +80,7 @@ function createHTMLTask(elementList) {
     newDiv.appendChild(delButton);
     newDiv.appendChild(editButton);
     newDiv.classList.add('task');
-    
+
     taskContainer.appendChild(newDiv);
     taskContainer.parentElement.classList.remove('hidden');
 }
@@ -86,7 +91,7 @@ async function deleteHTMLTask(event) {
 
     try {
         const response = await deleteTask(title);
-        console.log(response);
+        console.log('Client response: ', response);
         removeTaskDiv(parentDiv);
     } catch (error) {
         console.error('[ERROR] Error deleting task. ', error);
@@ -113,7 +118,7 @@ function removeTaskDiv(task) {
 }
 
 async function editHTMLTask(event) {
-    const task = event.target.closest(".task");
+    const task = event.target.parentElement;
     
     if (!task){
         return;
@@ -125,29 +130,27 @@ async function editHTMLTask(event) {
     if (isEditing) {
         // Guardar los cambios
         const titleInput = task.querySelector('input[name="title"]');
-        const descriptionInput = task.querySelector('input[name="description"]');
-        const dateInput = task.querySelector('input[name="date"]');
-        const statusSelect = task.querySelector('select[name="status"]');
-  
-        console.log(titleInput);
-
         const newTitle = document.createElement("h3");
         newTitle.textContent = titleInput.value;
-  
+        titleInput.replaceWith(newTitle);
+        
+        const descriptionInput = task.querySelector('input[name="description"]');
         const newDescription = document.createElement("p");
         newDescription.textContent = descriptionInput.value;
-  
+        descriptionInput.replaceWith(newDescription);
+
+        const dateInput = task.querySelector('input[name="date"]');
         const newDate = document.createElement("p");
         newDate.textContent = dateInput.value;
-  
+        dateInput.replaceWith(newDate);
+        
+        const statusSelect = task.querySelector('select[name="status"]');
         const newStatus = document.createElement("p");
         newStatus.textContent = statusSelect.value;
-  
-        titleInput.replaceWith(newTitle);
-        descriptionInput.replaceWith(newDescription);
-        dateInput.replaceWith(newDate);
         statusSelect.replaceWith(newStatus);
-  
+        
+        console.log('Nuevos valores: ', );
+        updateTask(task.querySelector('span'), [titleInput.value, descriptionInput.value, dateInput.value, statusSelect.value]);
         task.classList.remove("editing");
         event.target.textContent = "✏️";
     } else {
