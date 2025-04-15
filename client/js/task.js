@@ -19,11 +19,11 @@ document.addEventListener('click', async (event) => {
         const title = parentDiv.querySelector('h3');
 
         try {
-            console.log(title);
             const response = await deleteTask(title);
             console.log(response);
-            event.target.parentElement.remove();
-
+            removeTaskDiv(parentDiv);
+            parentDiv.remove();
+            
         } catch (error) {
             console.error('[ERROR] Error deleting task. ', error);
         }
@@ -70,4 +70,14 @@ function createHTMLTask(elementList) {
     
     newDiv.classList.add('task');
     taskContainer.appendChild(newDiv);
+    taskContainer.parentElement.classList.remove('hidden');
+}
+
+function removeTaskDiv(task) {
+    const tasksDiv = task.parentElement;
+    const mainConent = tasksDiv.parentElement;
+
+    if(tasksDiv.children.length === 1) {
+        mainConent.classList.add('hidden');
+    }
 }

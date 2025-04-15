@@ -44,14 +44,7 @@ export async function createTask(title, desc, date, status) {
 export async function deleteTask(title) {
     try {
         const tasks = JSON.parse(sessionStorage.getItem('Tasks'));
-        tasks.forEach(task => {
-            console.log(task);
-        });
-        console.log(title);
-        const deletedTask = tasks.filter(task => task.title.toLowerCase() === title.textContent.toLowerCase());
         const otherTasks = tasks.filter(task => task.title.toLowerCase() !== title.textContent.toLowerCase());
-        console.log('Tarea a eliminar: ',deletedTask);
-        console.log(otherTasks);
         sessionStorage.setItem('Tasks', JSON.stringify(otherTasks));
 
         const res = await fetch(BASE_URL, {

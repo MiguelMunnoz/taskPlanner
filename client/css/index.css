@@ -72,6 +72,10 @@ body {
     width: 100%;
 }
 
+.hidden {
+    display: none;
+}
+
 .main-content-taskContainer {
     display: flex;
     flex-direction: column;
@@ -107,8 +111,6 @@ body {
     height: 32px;
     font-weight: bold;
     cursor: pointer;
-    /*line-height: 24px;*/
-    /*text-align: center;*/
     z-index: 10; /* Por si acaso hay overlays o padding */
 }
 
