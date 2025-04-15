@@ -55,6 +55,7 @@ function createHTMLTask(id, elementList) {
 
     const newId = document.createElement('span');
     newId.classList.add('hidden');
+    newId.textContent = id;
     newDiv.appendChild(newId);
 
     elementList.forEach((e, i) => {
@@ -87,10 +88,10 @@ function createHTMLTask(id, elementList) {
 
 async function deleteHTMLTask(event) {
     const parentDiv = event.target.parentElement;
-    const title = parentDiv.querySelector('h3');
+    const id = parentDiv.querySelector('span');
 
     try {
-        const response = await deleteTask(title);
+        const response = await deleteTask(id);
         console.log('Client response: ', response);
         removeTaskDiv(parentDiv);
     } catch (error) {
@@ -148,9 +149,16 @@ async function editHTMLTask(event) {
         const newStatus = document.createElement("p");
         newStatus.textContent = statusSelect.value;
         statusSelect.replaceWith(newStatus);
+
+        const updateData = {
+            title: titleInput.value, 
+            description: descriptionInput.value, 
+            date: dateInput.value, 
+            status: statusSelect.value
+        };
         
-        console.log('Nuevos valores: ', );
-        updateTask(task.querySelector('span'), [titleInput.value, descriptionInput.value, dateInput.value, statusSelect.value]);
+        const response = await updateTask(task.querySelector('span'), updateData);
+        console.log('Client response: ', response);
         task.classList.remove("editing");
         event.target.textContent = "✏️";
     } else {

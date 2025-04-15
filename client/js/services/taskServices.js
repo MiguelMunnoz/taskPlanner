@@ -48,10 +48,10 @@ export async function createTask(title, desc, date, status) {
     }
 }
 
-export async function deleteTask(title) {
+export async function deleteTask(id) {
     try {
         const tasks = JSON.parse(sessionStorage.getItem('Tasks'));
-        const otherTasks = tasks.filter(task => task.title.toLowerCase() !== title.textContent.toLowerCase());
+        const otherTasks = tasks.filter(task => task.taskID != id.textContent);
         sessionStorage.setItem('Tasks', JSON.stringify(otherTasks));
 
         const res = await fetch(BASE_URL, {
@@ -65,9 +65,28 @@ export async function deleteTask(title) {
 
 export async function updateTask(id, updatedData) {
     try {
-        const tasks = JSON.parse(sessionStorage.getItem('Tasks'));
-        const updatedTask = tasks.filter(task => task.taskID === id);
-        console.log(updatedTask);
+        let tasks = JSON.parse(sessionStorage.getItem('Tasks'));
+        let updatedTask;
+
+        tasks = tasks.map(task => {
+            if (task.taskID == id.textContent) {
+                updatedTask = updatedData;
+                updatedTask.taskID = task.taskID;
+                return updatedTask; // Cambias lo que necesites
+            }
+            
+            return task;
+        });
+        sessionStorage.setItem('Tasks', JSON.stringify(tasks));
+
+        const res = await fetch(BASE_URL, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(updatedTask)
+        });
+
+        const data = await res.json();
+        return data;
     } catch (error) {
         console.error('[ERROR] Error updating the task request . ', error);
     }

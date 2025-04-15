@@ -17,7 +17,7 @@ const taskController = {
         async (req, res) => {
             try {
                 const data = req.body;
-                console.log(data);
+                console.log('Task created succesfully.');
                 res.status(201).json(data);
             } catch (error) {
                 console.log('[ERROR] Error creating task. ', error);
@@ -26,21 +26,20 @@ const taskController = {
         }
     ],
 
-    /*updateTaskController: [
+    updateTaskController: [
         async (req, res) => {
             try {
-                const postData = req.body;
-                console.log(postData);
-                sessionStorage.setItem(postData);
-                res.status(200).json(data);
+                const putData = req.body;
+                console.log('Task updated succesfully.');
+                res.status(200).json(putData);
             } catch (error) {
-                console.log('[ERROR] Error getting task info. ', error);
-                res.status(500).json({ error: '[ERROR] Error getting task info.' });
+                console.log('[ERROR] Error updating task info. ', error);
+                res.status(500).json({ error: '[ERROR] Error updating task info.' });
             }
         }
     ],
 
-    */deleteTaskController: [
+    deleteTaskController: [
         async (req, res) => {
             try {
                 const data = 'Task deleted succesfully.';
