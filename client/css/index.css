@@ -97,6 +97,15 @@ body {
     border: 2px solid #00abe4;
     border-radius: 8px;
     width: 100%;
+
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.fade-out {
+    opacity: 0;
+    transform: scale(0.9);
 }
 
 .delete-task-button {

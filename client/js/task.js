@@ -5,11 +5,11 @@ const deleteButtons = document.querySelectorAll('.delete-task-button');
 
 document.addEventListener("DOMContentLoaded",  () => {
     const tasks = JSON.parse(sessionStorage.getItem('Tasks'));
-    
-    tasks.forEach(e => {
-        createHTMLTask([e.title, e.description, e.date, e.status]);
-    });
-    
+    if(tasks) {
+        tasks.forEach(e => {
+            createHTMLTask([e.title, e.description, e.date, e.status]);
+        });
+    }
     //getTasks(tasks);
 });
 
@@ -22,8 +22,7 @@ document.addEventListener('click', async (event) => {
             const response = await deleteTask(title);
             console.log(response);
             removeTaskDiv(parentDiv);
-            parentDiv.remove();
-            
+            //parentDiv.remove();
         } catch (error) {
             console.error('[ERROR] Error deleting task. ', error);
         }
@@ -77,7 +76,19 @@ function removeTaskDiv(task) {
     const tasksDiv = task.parentElement;
     const mainConent = tasksDiv.parentElement;
 
-    if(tasksDiv.children.length === 1) {
-        mainConent.classList.add('hidden');
-    }
+    //Applying delete transition
+    task.classList.add('fade-out');
+
+    setTimeout(()=> {
+        //Hidding div if there is no tasks
+        if(tasksDiv.children.length === 1) {
+            mainConent.classList.add('hidden');
+            sessionStorage.removeItem('Tasks');
+        }
+
+        task.remove();
+
+    }, 300);
+
+    
 }
