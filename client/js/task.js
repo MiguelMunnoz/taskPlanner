@@ -2,14 +2,15 @@ import { getTasks, createTask, deleteTask, updateTask } from './services/taskSer
 
 const createButton = document.querySelector('#create-task-button');
 
-document.addEventListener("DOMContentLoaded",  () => {
-    const tasks = JSON.parse(sessionStorage.getItem('Tasks'));
+document.addEventListener('DOMContentLoaded', async () => {
+    const tasks = JSON.parse(localStorage.getItem('Tasks'));
     if(tasks) {
         tasks.forEach(e => {
-            createHTMLTask(e.taskID, [e.title, e.description, e.date, e.status]);
+            createHTMLTask(e.taskID, [e.title, e.description, e.date, e.time, e.status]);
         });
     }
-    //getTasks(tasks);
+    const response = await getTasks();
+    console.log('Client response: ', response);
 });
 
 document.addEventListener('click', async (event) => {
@@ -25,16 +26,18 @@ createButton.addEventListener('click', async () => {
     const title = document.querySelector('#title-input');
     const description = document.querySelector('#description-input');
     const date = document.querySelector('#date-input');
+    const time = document.querySelector('#time-input');
     const status = document.querySelector('#status-input');
     
     try {
-        const response = await createTask(title.value, description.value, date.value, status.value);
+        const response = await createTask(title.value, description.value, date.value, time.value, status.value);
         console.log('Client response: ', response);
 
         if(response) {
-            createHTMLTask(response.taskID, [response.title, response.description, response.date, response.status]);
+            cleanForm(title, description, date, time, status);
+            createHTMLTask(response.taskID, [response.title, response.description, response.date, response.time, response.status]);
         }
-        
+
     } catch (error) {
         console.error('[ERROR] Error creating task. ', error);
     }
@@ -58,9 +61,27 @@ function createHTMLTask(id, elementList) {
     newId.textContent = id;
     newDiv.appendChild(newId);
 
+    //Nucleo de la funcion de creacion
     elementList.forEach((e, i) => {
         let newElement;
 
+        /*switch (i) {
+            case 0:
+                newElement = document.createElement('h3');
+                newElement.classList.add('task-title');
+            case 1:
+                newElement = document.createElement(`p`);
+                newElement.classList.add('task-description');
+            case 2:
+                newElement = document.createElement(`p`);
+                newElement.classList.add('task-date');
+            case 3:
+                newElement = document.createElement(`p`);
+                newElement.classList.add('task-time');
+            case 4:
+                newElement = document.createElement(`p`);
+                newElement.classList.add('task-status');
+        }*/
         if(i === 0) {
             newElement = document.createElement('h3');
             newElement.classList.add('task-title');
@@ -70,6 +91,8 @@ function createHTMLTask(id, elementList) {
                 newElement.classList.add('task-description');
             } else if(i === 2) {
                 newElement.classList.add('task-date');
+            } else if(i === 3) {
+                newElement.classList.add('task-time');
             } else {
                 newElement.classList.add('task-status');
             }
@@ -107,10 +130,10 @@ function removeTaskDiv(task) {
     task.classList.add('fade-out');
 
     setTimeout(()=> {
-        //Hidding div if there is no tasks
+        //Hidding div if there are no tasks
         if(tasksDiv.children.length === 1) {
             mainConent.classList.add('hidden');
-            sessionStorage.removeItem('Tasks');
+            localStorage.removeItem('Tasks');
         }
 
         task.remove();
@@ -126,87 +149,122 @@ async function editHTMLTask(event) {
     } 
 
     // Detectamos si estamos en modo edición o no
-    const isEditing = task.classList.contains("editing");
+    const isEditing = task.classList.contains('editing');
 
     if (isEditing) {
         // Guardar los cambios
-        const titleInput = task.querySelector('input[name="title"]');
-        const newTitle = document.createElement("h3");
+        const titleDiv = task.querySelector('input[name="title"]').parentElement;
+        const titleInput = titleDiv.querySelector('input');
+        const newTitle = document.createElement('h3');
         newTitle.textContent = titleInput.value;
-        titleInput.replaceWith(newTitle);
+        titleDiv.replaceWith(newTitle);
         
-        const descriptionInput = task.querySelector('input[name="description"]');
-        const newDescription = document.createElement("p");
+        const descriptionDiv = task.querySelector('input[name="description"]').parentElement;
+        const descriptionInput = descriptionDiv.querySelector('input');
+        const newDescription = document.createElement('p');
         newDescription.textContent = descriptionInput.value;
-        descriptionInput.replaceWith(newDescription);
+        descriptionDiv.replaceWith(newDescription);
 
-        const dateInput = task.querySelector('input[name="date"]');
-        const newDate = document.createElement("p");
+        const dateDiv = task.querySelector('input[name="date"]').parentElement;
+        const dateInput = dateDiv.querySelector('input');
+        const newDate = document.createElement('p');
         newDate.textContent = dateInput.value;
-        dateInput.replaceWith(newDate);
+        dateDiv.replaceWith(newDate);
+
+        const timeDiv = task.querySelector('input[name="time"]').parentElement;
+        const timeInput = timeDiv.querySelector('input');
+        const newTime = document.createElement('p');
+        newTime.textContent = timeInput.value;
+        timeDiv.replaceWith(newTime);
         
-        const statusSelect = task.querySelector('select[name="status"]');
-        const newStatus = document.createElement("p");
-        newStatus.textContent = statusSelect.value;
-        statusSelect.replaceWith(newStatus);
+        const statusDiv = task.querySelector('select[name="status"]').parentElement;
+        const statusInput = statusDiv.querySelector('select');
+        const newStatus = document.createElement('p');
+        newStatus.textContent = statusInput.value;
+        statusDiv.replaceWith(newStatus);
 
         const updateData = {
             title: titleInput.value, 
             description: descriptionInput.value, 
-            date: dateInput.value, 
-            status: statusSelect.value
+            date: dateInput.value,
+            time: timeInput.value, 
+            status: statusInput.value
         };
         
         const response = await updateTask(task.querySelector('span'), updateData);
         console.log('Client response: ', response);
-        task.classList.remove("editing");
-        event.target.textContent = "✏️";
+        
+        task.classList.remove('editing');
+        event.target.textContent = '✏️';
     } else {
         // Pasar a modo edición
-        const elements = task.querySelectorAll("h3, p");
-  
-        const [titleEl, descriptionEl, dateEl, statusEl] = elements;
+        const elements = task.querySelectorAll('h3, p');
+        const [titleHTML, descriptionHTML, dateHTML, timeHTML, statusHTML] = elements;
   
         // Title
-        const titleInput = document.createElement("input");
-        titleInput.type = "text";
-        titleInput.name = "title";
-        titleInput.value = titleEl.textContent;
-        titleEl.replaceWith(titleInput);
+        const titleInput = document.createElement('input');
+        titleInput.type = 'text';
+        titleInput.name = 'title';
+        titleInput.value = titleHTML.textContent;
+        titleHTML.replaceWith(createEditInput('Title', titleInput));
   
         // Description
-        const descriptionInput = document.createElement("input");
-        descriptionInput.type = "text";
-        descriptionInput.name = "description";
-        descriptionInput.value = descriptionEl.textContent;
-        descriptionEl.replaceWith(descriptionInput);
+        const descriptionInput = document.createElement('input');
+        descriptionInput.type = 'text';
+        descriptionInput.name = 'description';
+        descriptionInput.value = descriptionHTML.textContent;
+        descriptionHTML.replaceWith(createEditInput('Description', descriptionInput));
   
         // Date
-        const dateInput = document.createElement("input");
-        dateInput.type = "date";
-        dateInput.name = "date";
-        dateInput.value = dateEl.textContent;
-        dateEl.replaceWith(dateInput);
+        const dateInput = document.createElement('input');
+        dateInput.type = 'date';
+        dateInput.name = 'date';
+        dateInput.value = dateHTML.textContent;
+        dateHTML.replaceWith(createEditInput('Date', dateInput));
+
+        // Time
+        const timeInput = document.createElement('input');
+        timeInput.type = 'time';
+        timeInput.name = 'time';
+        timeInput.value = timeHTML.textContent;
+        timeHTML.replaceWith(createEditInput('Time', timeInput));
   
         // Status
-        const statusSelect = document.createElement("select");
-        statusSelect.name = "status";
+        const statusInput = document.createElement('select');
+        statusInput.name = 'status';
 
-        ["Pending", "In Progress", "Completed"].forEach(status => {
-            const option = document.createElement("option");
+        ['Pending', 'In Progress', 'Completed'].forEach(status => {
+            const option = document.createElement('option');
             option.value = status;
             option.textContent = status;
             
-            if (statusEl.textContent.trim().toLowerCase() === status.toLowerCase()) {
+            if (statusHTML.textContent.trim().toLowerCase() === status.toLowerCase()) {
                 option.selected = true;
             }
 
-            statusSelect.appendChild(option);
+            statusInput.appendChild(option);
         });
         
-        statusEl.replaceWith(statusSelect);
+        statusHTML.replaceWith(createEditInput('Status', statusInput));
     
-        task.classList.add("editing");
-        event.target.textContent = "💾";
+        task.classList.add('editing');
+        event.target.textContent = '💾';
       }
+}
+
+function createEditInput(labelText, inputElement) {
+    const div = document.createElement('div');
+    const label = document.createElement('label');
+    label.textContent = labelText;
+    div.appendChild(label);
+    div.appendChild(inputElement);
+    return div;
+}
+
+function cleanForm(title, description, date, time, status) {
+    title.value = '',
+    description.value = '',
+    date.value = '',
+    time.value = '',
+    status.value = 'pending' 
 }

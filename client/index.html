@@ -23,6 +23,7 @@
         <aside class="sidebar">
             <div class="taskForm">
                 <h3>Create Your Task!</h3>
+                
                 <div class="input-div">
                     <label for="title-input">Title</label>
                     <input type="text" id="title-input" class="input">
@@ -31,10 +32,16 @@
                     <label for="description-input">Description</label>
                     <input type="text" id="description-input" class="input">
                 </div>
-                <div class="input-div">
-                    <label for="date-input">Date</label>
-                    <input type="date" id="date-input" class="input">
-                </div>
+                <div class="input-div date-time-group">
+                    <div class="date-time-div">
+                      <label for="date-input">Date</label>
+                      <input type="date" id="date-input" class="input">
+                    </div>
+                    <div class="date-time-div">
+                      <label for="time-input">Time</label>
+                      <input type="time" id="time-input" class="input">
+                    </div>
+                  </div>
                 <div class="input-div">
                     <label for="options">Status</label>
                     <select id="status-input" name="options" class="input">

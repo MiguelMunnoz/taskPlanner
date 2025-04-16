@@ -4,7 +4,7 @@ const taskController = {
     getTasksController: [
         async (req, res) => {
             try {
-                const data = req;
+                const data = 'Getting task info.';
                 res.status(200).json(data);
             } catch (error) {
                 console.log('[ERROR] Error getting task info. ', error);

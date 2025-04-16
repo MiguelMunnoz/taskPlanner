@@ -1,20 +1,22 @@
 const BASE_URL = 'http://localhost:3000/tasks';
 let taskID = 0;
 
-export async function getTasks(tasks) {
+export async function getTasks() {
     try {
         const res = await fetch(BASE_URL);
-        return res;
+        const data = await res.json();
+        return data;
     } catch (error) {
         console.error('[ERROR] Error gettinf tasks info. ', error);
     }
 }
 
-export async function createTask(title, desc, date, status) {
+export async function createTask(title, desc, date, time, status) {
     const postData = {
         title,
         description: desc,
         date,
+        time,
         status
     };
 
@@ -22,18 +24,15 @@ export async function createTask(title, desc, date, status) {
     postData.taskID = taskID;
 
     try {
-        let tasks = JSON.parse(sessionStorage.getItem('Tasks'));
-         
-
+        let tasks = JSON.parse(localStorage.getItem('Tasks'));
         if(tasks) {
-            
             tasks.push(postData);    
         } else {
             tasks = [postData];
         }
         
-        sessionStorage.setItem('Tasks', JSON.stringify(tasks));
-        console.log('Task saved in sessionStorage.', postData);
+        localStorage.setItem('Tasks', JSON.stringify(tasks));
+        console.log('Task saved in localStorage.', postData);
 
         const res = await fetch(BASE_URL, {
             method: 'POST',
@@ -50,9 +49,9 @@ export async function createTask(title, desc, date, status) {
 
 export async function deleteTask(id) {
     try {
-        const tasks = JSON.parse(sessionStorage.getItem('Tasks'));
+        const tasks = JSON.parse(localStorage.getItem('Tasks'));
         const otherTasks = tasks.filter(task => task.taskID != id.textContent);
-        sessionStorage.setItem('Tasks', JSON.stringify(otherTasks));
+        localStorage.setItem('Tasks', JSON.stringify(otherTasks));
 
         const res = await fetch(BASE_URL, {
             method: 'DELETE'
@@ -65,7 +64,7 @@ export async function deleteTask(id) {
 
 export async function updateTask(id, updatedData) {
     try {
-        let tasks = JSON.parse(sessionStorage.getItem('Tasks'));
+        let tasks = JSON.parse(localStorage.getItem('Tasks'));
         let updatedTask;
 
         tasks = tasks.map(task => {
@@ -77,7 +76,7 @@ export async function updateTask(id, updatedData) {
             
             return task;
         });
-        sessionStorage.setItem('Tasks', JSON.stringify(tasks));
+        localStorage.setItem('Tasks', JSON.stringify(tasks));
 
         const res = await fetch(BASE_URL, {
             method: 'PUT',

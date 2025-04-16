@@ -1,27 +1,30 @@
-body {
-    margin: 0;
-    padding: 0;
+* {
     box-sizing: border-box;
 }
 
+body {
+    margin: 0;
+    padding: 0;
+}
+
 .main {
-    box-sizing: border-box;
     display: flex;
     flex-direction: row;
     gap: 10px;
     background-color: #e9f1fa;
     padding: 3px;
     width: 100%;
-}
+    align-items: flex-start; /* Añadido */
+  }
 
 .sidebar {
     background-color: #2980b9;
     border: 2px solid black;
     border-radius: 8px;
-    width: 20%;
-    height: 100%;
+    width: 300px; /* Mejor usar píxeles fijos */
     padding: 5px;
-}
+    flex-shrink: 0; /* Impide que se reduzca si el contenido de al lado crece */
+  }
 
 .taskForm {
     display: flex;
@@ -61,10 +64,20 @@ body {
     padding: 5px;
     width: 100%; /* Se adapta al ancho del contenedor */
     border-radius: 5px;
-    box-sizing: border-box;
+}
+
+.date-time-group {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.date-time-div {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
   
-
 #create-task-button {
     align-self: center;
     margin-top: 10px;
@@ -81,17 +94,18 @@ body {
     background-color: #00abe4;
 }
 
+.hidden {
+    display: none;
+}
+
 .main-content {
     background-color: #2980b9;
     border: 2px solid black;
     border-radius: 8px;
     padding: 5px;
-    width: 100%;
-}
-
-.hidden {
-    display: none;
-}
+    flex-grow: 1;
+    min-width: 0;
+  }
 
 .main-content-taskContainer {
     display: flex;
@@ -176,8 +190,7 @@ body {
   
   font-family: inherit;
   font-size: inherit;
-  
-  box-sizing: border-box;
+
 }
 
 
@@ -185,11 +198,9 @@ body {
 @media (max-width: 1024px) {
     .main {
         flex-direction: column;
-        box-sizing: border-box;
     }
     
     .sidebar {
-        box-sizing: border-box;
         width: 100%;
     }
 
@@ -198,7 +209,7 @@ body {
     }
 
     .main-content {
-        box-sizing: border-box;
+        width: 100%;
     }
 
 }
