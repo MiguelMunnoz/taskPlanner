@@ -1,6 +1,7 @@
 import { getTasks, createTask, deleteTask, updateTask } from './services/taskServices.js';
 
 const createButton = document.querySelector('#create-task-button');
+const statusFilter = document.querySelector('#status-filter');
 
 document.addEventListener('DOMContentLoaded', async () => {
     const tasks = JSON.parse(localStorage.getItem('Tasks'));
@@ -11,6 +12,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     const response = await getTasks();
     console.log('Client response: ', response);
+});
+
+statusFilter.addEventListener('change', () => {
+    const selectedStatus = statusFilter.value.toLowerCase();
+    const tasks = document.querySelectorAll('.main-content-taskContainer .task');
+    console.log(tasks);
+    tasks.forEach(task => {
+        console.log('Iterando...');
+        const statusElement = task.querySelector('.task-status');
+        const taskStatus = statusElement.textContent.toLowerCase();
+        
+        if (selectedStatus === 'all' || taskStatus === selectedStatus) {
+            task.style.display = 'flex'; // o 'block' según tu diseño
+        } else {
+            task.style.display = 'none';
+        }
+    });
 });
 
 document.addEventListener('click', async (event) => {
@@ -86,22 +104,6 @@ function createHTMLTask(id, elementList) {
                     break;
             }
         }
-        
-        /*if(i === 0) {
-            newElement = document.createElement('h3');
-            newElement.classList.add('task-title');
-        } else {
-            newElement = document.createElement(`p`);
-            if(i === 1) {
-                newElement.classList.add('task-description');
-            } else if(i === 2) {
-                newElement.classList.add('task-date');
-            } else if(i === 3) {
-                newElement.classList.add('task-time');
-            } else {
-                newElement.classList.add('task-status');
-            }
-        }*/
         newElement.textContent = e;
         newDiv.appendChild(newElement);
     });
@@ -111,7 +113,7 @@ function createHTMLTask(id, elementList) {
     newDiv.classList.add('task');
 
     taskContainer.appendChild(newDiv);
-    taskContainer.parentElement.classList.remove('hidden');
+    taskContainer.classList.remove('hidden');
 }
 
 async function deleteHTMLTask(event) {
@@ -133,16 +135,14 @@ function removeTaskDiv(task) {
 
     //Applying delete transition
     task.classList.add('fade-out');
-
     setTimeout(()=> {
         //Hidding div if there are no tasks
         if(tasksDiv.children.length === 1) {
-            mainConent.classList.add('hidden');
+            tasksDiv.classList.add('hidden');
+            //mainConent.classList.add('hidden');
             localStorage.removeItem('Tasks');
         }
-
         task.remove();
-
     }, 300);
 }
 

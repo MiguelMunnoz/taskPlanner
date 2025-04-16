@@ -96,6 +96,7 @@ body {
 
 .hidden {
     display: none;
+    visibility: hidden;
 }
 
 .main-content {
@@ -105,7 +106,19 @@ body {
     padding: 5px;
     flex-grow: 1;
     min-width: 0;
-  }
+}
+
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    background-color: #2980b9;
+    border-radius: 8px;
+    padding: 8px;
+    color: white;
+    font-weight: bold;
+}
 
 .main-content-taskContainer {
     display: flex;
@@ -117,6 +130,7 @@ body {
     border: 2px solid #e9f1fa;
     border-radius: 8px;
     padding: 5px;
+    margin-top: 5px;
 }
 
 .task {
