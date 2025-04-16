@@ -4,31 +4,9 @@ const createButton = document.querySelector('#create-task-button');
 const statusFilter = document.querySelector('#status-filter');
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const tasks = JSON.parse(localStorage.getItem('Tasks'));
-    if(tasks) {
-        tasks.forEach(e => {
-            createHTMLTask(e.taskID, [e.title, e.description, e.date, e.time, e.status]);
-        });
-    }
+    showTasks();
     const response = await getTasks();
     console.log('Client response: ', response);
-});
-
-statusFilter.addEventListener('change', () => {
-    const selectedStatus = statusFilter.value.toLowerCase();
-    const tasks = document.querySelectorAll('.main-content-taskContainer .task');
-    console.log(tasks);
-    tasks.forEach(task => {
-        console.log('Iterando...');
-        const statusElement = task.querySelector('.task-status');
-        const taskStatus = statusElement.textContent.toLowerCase();
-        
-        if (selectedStatus === 'all' || taskStatus === selectedStatus) {
-            task.style.display = 'flex'; // o 'block' según tu diseño
-        } else {
-            task.style.display = 'none';
-        }
-    });
 });
 
 document.addEventListener('click', async (event) => {
@@ -38,6 +16,31 @@ document.addEventListener('click', async (event) => {
     } else if (event.target.classList.contains('edit-task-button')) {
         editHTMLTask(event);
     }
+});
+
+statusFilter.addEventListener('change', async () => {
+    const selectedStatus = statusFilter.value.toLowerCase();
+    const tasks = document.querySelectorAll('.main-content-taskContainer .task');
+    const notFoundMessage = document.querySelector('#not-found-message');
+
+    let visibleTasks = 0;
+    tasks.forEach(task => {
+        const statusElement = task.querySelector('.task-status');
+        const taskStatus = statusElement.textContent.toLowerCase();
+        
+        if (selectedStatus === 'all' || taskStatus === selectedStatus) {
+            task.style.display = 'flex';
+            visibleTasks++;
+        } else {
+            task.style.display = 'none';
+        }
+
+        if (visibleTasks === 0) {
+            notFoundMessage.classList.remove('hidden');
+        } else {
+            notFoundMessage.classList.add('hidden');
+        }
+    });
 });
 
 createButton.addEventListener('click', async () => {
@@ -251,4 +254,14 @@ function cleanForm(title, description, date, time, status) {
     date.value = '',
     time.value = '',
     status.value = 'pending' 
+}
+
+function showTasks() {
+    const tasks = JSON.parse(localStorage.getItem('Tasks'));
+    
+    if(tasks) {
+        tasks.forEach(task => {
+            createHTMLTask(task.taskID, [task.title, task.description, task.date, task.time, task.status]);
+        });
+    }
 }

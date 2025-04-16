@@ -120,6 +120,12 @@ body {
     font-weight: bold;
 }
 
+#not-found-message {
+    text-align:center; 
+    font-weight: bold; 
+    color: red;
+}
+
 .main-content-taskContainer {
     display: flex;
     flex-direction: column;
