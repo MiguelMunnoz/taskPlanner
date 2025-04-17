@@ -142,12 +142,13 @@ body {
 .task {
     display: flex;
     flex-direction: column;
-
     position: relative;
+    width: 100%;
+    padding: 10px;
+
     background-color: #00abe4;
     border: 2px solid #00abe4;
     border-radius: 8px;
-    width: 100%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -157,6 +158,49 @@ body {
 
 .task:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.task input, .task select {
+    width: 50%;
+    padding: 6px;
+    margin: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid black;
+    
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.task-description {
+    padding: 5px;
+    border: 2px solid white;
+    border-radius: 8px;
+    color: white;
+}
+
+.task-status {
+    display: inline-block;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+    width: fit-content;
+}
+
+/* Colores según el estado */
+.status-pending {
+    background-color: #f39c12;
+}
+
+.status-in-progress {
+    background-color: #3498db;
+}
+
+.status-completed {
+    background-color: #2ecc71;
 }
 
 .fade-out {
@@ -200,19 +244,6 @@ body {
 .edit-task-button:hover {
     scale: 1.1;
 }
-
-.task input, .task select {
-  width: 85%;
-  padding: 6px;
-  margin: 0.5rem;
-  border-radius: 5px;
-  border: 1px solid black;
-  
-  font-family: inherit;
-  font-size: inherit;
-
-}
-
 
 
 @media (max-width: 1024px) {

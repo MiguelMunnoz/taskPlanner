@@ -45,12 +45,9 @@ createButton.addEventListener('click', async () => {
 
 function getAndFilterTasks(filter) {
     const tasks = JSON.parse(localStorage.getItem('Tasks'));
-    console.log('Recojo todas las tasks.', tasks);
 
     if(tasks) {
-        console.log('Aplicamos filtro: -',filter,'-');
         const filteredTasks = tasks.filter(task => (task.status === filter || filter === 'all'));
-        console.log('Filtro para saber que tasks tengo que pintar. ', filteredTasks);
         return filteredTasks;
     } else {
         return [];
@@ -64,8 +61,7 @@ function paintHTMLTasks(tasks) {
 
     if(tasks.length > 0) {
         tasks.forEach(task => {
-            console.log('Creando tarea: ', task);
-            createHTMLTask(task.taskID, [task.title, task.description, task.date, task.time, task.status]);
+            createHTMLTask(task.taskID, [task.title, task.status, task.date, task.time, task.description]);
         });
         notFoundMessage.classList.add('hidden');
     } else {
@@ -98,25 +94,37 @@ function createHTMLTask(id, taskValues) {
         if (i === 0) {
             newElement = document.createElement('h3');
             newElement.classList.add('task-title');
+            newElement.textContent = taskElement.charAt(0).toUpperCase() + taskElement.slice(1);
         } else {
             newElement = document.createElement('p');
         
             switch (i) {
                 case 1:
-                    newElement.classList.add('task-description');
+                    newElement = document.createElement('span');
+                    newElement.classList.add('task-status');
+                    newElement.classList.add(`status-${taskElement.toLowerCase().replace(/\s/g, '-')}`); // añade clase dinámica
+                    newElement.textContent = taskElement.charAt(0).toUpperCase() + taskElement.slice(1);
                     break;
                 case 2:
                     newElement.classList.add('task-date');
+                    newElement.textContent = taskElement;
                     break;
                 case 3:
                     newElement.classList.add('task-time');
+                    newElement.textContent = taskElement;
                     break;
                 case 4:
-                    newElement.classList.add('task-status');
+                    const descSpan = document.createElement('span');
+                    descSpan.textContent = 'Description:';
+                    const textNode = document.createTextNode(` ${taskElement}`);
+
+                    newElement.appendChild(descSpan);
+                    newElement.appendChild(textNode);
+                    newElement.classList.add('task-description');
                     break;
             }
         }
-        newElement.textContent = taskElement;
+
         newDiv.appendChild(newElement);
     });
     
@@ -139,6 +147,11 @@ function cleanForm(title, description, date, time, status) {
 async function deleteHTMLTask(event) {
     const parentDiv = event.target.parentElement;
     const id = parentDiv.querySelector('span');
+
+    const confirmDelete = confirm(`Are you sure you want to delete this task?`);
+    if (!confirmDelete) {
+        return;
+    }
 
     try {
         const response = await deleteTask(id);
@@ -173,13 +186,19 @@ async function editHTMLTask(event) {
     const isEditing = task.classList.contains('editing');
 
     if (isEditing) {
+
+        const confirmUpdate = confirm(`Are you sure you want to update this task?`);
+        if (!confirmUpdate) {
+            return;
+        }
+
         // Guardar los cambios y eliminar los estilos de edicion
         const titleInput = deleteEditInput(task, 'title', 'h3');
         const descriptionInput = deleteEditInput(task, 'description','p');
         const dateInput = deleteEditInput(task, 'date', 'p');
         const timeInput = deleteEditInput(task, 'time', 'p');
         const statusInput = deleteEditInput(task, 'status', 'p');
-    
+
         const updateData = {
             title: titleInput.value, 
             description: descriptionInput.value, 
@@ -196,14 +215,14 @@ async function editHTMLTask(event) {
 
     } else {
         // Pasar a modo edicion
-        const elements = task.querySelectorAll('h3, p');
-        const [titleHTML, descriptionHTML, dateHTML, timeHTML, statusHTML] = elements;
+        const elements = task.querySelectorAll('h3, p, span');
+        const [idHTML, titleHTML, statusHTML, dateHTML, timeHTML, descriptionHTML] = elements;
         
         createEditInput('Title', 'text', titleHTML);
-        createEditInput('Description', 'text', descriptionHTML);
+        createEditInput('Status', ['Pending', 'In Progress', 'Completed'], statusHTML);
         createEditInput('Date', 'date', dateHTML);
         createEditInput('Time', 'time', timeHTML);
-        createEditInput('Status', ['Pending', 'In Progress', 'Completed'], statusHTML);
+        createEditInput('Description', 'text', descriptionHTML);
     
         task.classList.add('editing');
         event.target.textContent = '💾';
@@ -249,16 +268,18 @@ function createEditInput(labelText, inputType, elementHTML){
 function deleteEditInput(task, name, elementType) {
     let taskDiv;
     let elementInput;
+    const newElement = document.createElement(`${elementType}`);
 
     if(name === 'status') {
         taskDiv = task.querySelector(`select[name=${name}]`).parentElement; 
         elementInput = taskDiv.querySelector('select');
+        newElement.classList.add(`status-${elementInput.value.toLowerCase().replace(/\s/g, '-')}`);
     } else {
         taskDiv = task.querySelector(`input[name=${name}]`).parentElement;
         elementInput = taskDiv.querySelector('input');
     }
 
-    const newElement = document.createElement(`${elementType}`);
+    
     newElement.textContent = elementInput.value;
     newElement.classList.add(`task-${name}`);
     taskDiv.replaceWith(newElement);
