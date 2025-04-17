@@ -4,13 +4,13 @@ const createButton = document.querySelector('#create-task-button');
 const statusFilter = document.querySelector('#status-filter');
 
 document.addEventListener('DOMContentLoaded', async () => {
-    showTasks();
+    paintHTMLTasks(getAndFilterTasks(statusFilter.value));
+
     const response = await getTasks();
     console.log('Client response: ', response);
 });
 
 document.addEventListener('click', async (event) => {
-    
     if(event.target.classList.contains('delete-task-button')) {
         deleteHTMLTask(event);
     } else if (event.target.classList.contains('edit-task-button')) {
@@ -19,28 +19,7 @@ document.addEventListener('click', async (event) => {
 });
 
 statusFilter.addEventListener('change', async () => {
-    const selectedStatus = statusFilter.value.toLowerCase();
-    const tasks = document.querySelectorAll('.main-content-taskContainer .task');
-    const notFoundMessage = document.querySelector('#not-found-message');
-
-    let visibleTasks = 0;
-    tasks.forEach(task => {
-        const statusElement = task.querySelector('.task-status');
-        const taskStatus = statusElement.textContent.toLowerCase();
-        
-        if (selectedStatus === 'all' || taskStatus === selectedStatus) {
-            task.style.display = 'flex';
-            visibleTasks++;
-        } else {
-            task.style.display = 'none';
-        }
-
-        if (visibleTasks === 0) {
-            notFoundMessage.classList.remove('hidden');
-        } else {
-            notFoundMessage.classList.add('hidden');
-        }
-    });
+    paintHTMLTasks(getAndFilterTasks(statusFilter.value));
 });
 
 createButton.addEventListener('click', async () => {
@@ -49,14 +28,14 @@ createButton.addEventListener('click', async () => {
     const date = document.querySelector('#date-input');
     const time = document.querySelector('#time-input');
     const status = document.querySelector('#status-input');
-    
+
     try {
         const response = await createTask(title.value, description.value, date.value, time.value, status.value);
         console.log('Client response: ', response);
 
         if(response) {
             cleanForm(title, description, date, time, status);
-            createHTMLTask(response.taskID, [response.title, response.description, response.date, response.time, response.status]);
+            paintHTMLTasks(getAndFilterTasks(statusFilter.value));
         }
 
     } catch (error) {
@@ -64,26 +43,56 @@ createButton.addEventListener('click', async () => {
     }
 });
 
-function createHTMLTask(id, elementList) {
+function getAndFilterTasks(filter) {
+    const tasks = JSON.parse(localStorage.getItem('Tasks'));
+    console.log('Recojo todas las tasks.', tasks);
+
+    if(tasks) {
+        console.log('Aplicamos filtro: -',filter,'-');
+        const filteredTasks = tasks.filter(task => (task.status === filter || filter === 'all'));
+        console.log('Filtro para saber que tasks tengo que pintar. ', filteredTasks);
+        return filteredTasks;
+    } else {
+        return [];
+    }
+}
+
+function paintHTMLTasks(tasks) {
+    const notFoundMessage = document.querySelector('#not-found-message');
+    const taskContainer = document.querySelector('.main-content-taskContainer');
+    taskContainer.replaceChildren();
+
+    if(tasks.length > 0) {
+        tasks.forEach(task => {
+            console.log('Creando tarea: ', task);
+            createHTMLTask(task.taskID, [task.title, task.description, task.date, task.time, task.status]);
+        });
+        notFoundMessage.classList.add('hidden');
+    } else {
+        notFoundMessage.classList.remove('hidden');
+    }
+}
+
+function createHTMLTask(id, taskValues) {
     const taskContainer = document.querySelector('.main-content-taskContainer');
     const newDiv = document.createElement('div');
 
+    //Creamos los botones de eliminacion y edicion de cada tarea
     const delButton = document.createElement('button');
     const editButton = document.createElement('button');
-    
     delButton.textContent = 'X';
     editButton.textContent = '✏️';
-    
     delButton.classList.add('delete-task-button');
     editButton.classList.add('edit-task-button');
 
+    //Añadimos un id para manejar mejor cada tarea
     const newId = document.createElement('span');
     newId.classList.add('hidden');
     newId.textContent = id;
     newDiv.appendChild(newId);
 
     //Creamos los campos para almacenar los datos del fomulario
-    elementList.forEach((e, i) => {
+    taskValues.forEach((taskElement, i) => {
         
         let newElement;
         if (i === 0) {
@@ -107,7 +116,7 @@ function createHTMLTask(id, elementList) {
                     break;
             }
         }
-        newElement.textContent = e;
+        newElement.textContent = taskElement;
         newDiv.appendChild(newElement);
     });
     
@@ -117,6 +126,14 @@ function createHTMLTask(id, elementList) {
 
     taskContainer.appendChild(newDiv);
     taskContainer.classList.remove('hidden');
+}
+
+function cleanForm(title, description, date, time, status) {
+    title.value = '',
+    description.value = '',
+    date.value = '',
+    time.value = '',
+    status.value = 'pending' 
 }
 
 async function deleteHTMLTask(event) {
@@ -176,6 +193,7 @@ async function editHTMLTask(event) {
         
         task.classList.remove('editing');
         event.target.textContent = '✏️';
+
     } else {
         // Pasar a modo edicion
         const elements = task.querySelectorAll('h3, p');
@@ -246,22 +264,4 @@ function deleteEditInput(task, name, elementType) {
     taskDiv.replaceWith(newElement);
 
     return elementInput;
-}
-
-function cleanForm(title, description, date, time, status) {
-    title.value = '',
-    description.value = '',
-    date.value = '',
-    time.value = '',
-    status.value = 'pending' 
-}
-
-function showTasks() {
-    const tasks = JSON.parse(localStorage.getItem('Tasks'));
-    
-    if(tasks) {
-        tasks.forEach(task => {
-            createHTMLTask(task.taskID, [task.title, task.description, task.date, task.time, task.status]);
-        });
-    }
 }
