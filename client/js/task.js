@@ -114,13 +114,20 @@ function createHTMLTask(id, taskValues) {
                     newElement.textContent = taskElement;
                     break;
                 case 4:
-                    const descSpan = document.createElement('span');
-                    descSpan.textContent = 'Description:';
-                    const textNode = document.createTextNode(` ${taskElement}`);
+                    const wrapperDiv = document.createElement('div');
+                    wrapperDiv.classList.add('task-description'); // puedes usar esta clase para estilos
 
-                    newElement.appendChild(descSpan);
-                    newElement.appendChild(textNode);
-                    newElement.classList.add('task-description');
+                    const labelSpan = document.createElement('span');
+                    labelSpan.textContent = 'Description:';
+                    labelSpan.style.fontWeight = 'bold'; // opcional, o usa una clase CSS
+
+                    const contentSpan = document.createElement('span');
+                    contentSpan.textContent = ` ${taskElement}`; // el contenido real
+
+                    wrapperDiv.appendChild(labelSpan);
+                    wrapperDiv.appendChild(contentSpan);
+                    console.log(wrapperDiv);
+                    newDiv.appendChild(wrapperDiv);
                     break;
             }
         }
@@ -215,14 +222,11 @@ async function editHTMLTask(event) {
 
     } else {
         // Pasar a modo edicion
-        const elements = task.querySelectorAll('h3, p, span');
-        const [idHTML, titleHTML, statusHTML, dateHTML, timeHTML, descriptionHTML] = elements;
-        
-        createEditInput('Title', 'text', titleHTML);
-        createEditInput('Status', ['Pending', 'In Progress', 'Completed'], statusHTML);
-        createEditInput('Date', 'date', dateHTML);
-        createEditInput('Time', 'time', timeHTML);
-        createEditInput('Description', 'text', descriptionHTML);
+        createEditInput('Title', 'text', task.querySelector('.task-title'));
+        createEditInput('Status', ['Pending', 'In Progress', 'Completed'], task.querySelector('.task-status'));
+        createEditInput('Date', 'date', task.querySelector('.task-date'));
+        createEditInput('Time', 'time', task.querySelector('.task-time'));
+        createEditInput('Description', 'text', task.querySelector('.task-description'));
     
         task.classList.add('editing');
         event.target.textContent = '💾';
@@ -252,10 +256,16 @@ function createEditInput(labelText, inputType, elementHTML){
         inputElement = document.createElement('input');
         inputElement.type = inputType;
         inputElement.name = labelText.toLowerCase();
-        inputElement.value = elementHTML.textContent;
+
+        if(labelText.toLowerCase() === 'description') {
+            const descContent = elementHTML.nextElementSibling;
+            inputElement.value = descContent.textContent;
+        } else {
+            inputElement.value = elementHTML.textContent;
+        }
     }
 
-    //Adding labels and wrapping info in a div
+    //Añadimos etiquetas y envolvemos cada elemento en un div
     const wrapperDiv = document.createElement('div');
     const label = document.createElement('label');
     
@@ -266,23 +276,44 @@ function createEditInput(labelText, inputType, elementHTML){
 }
 
 function deleteEditInput(task, name, elementType) {
-    let taskDiv;
+    let inputDiv;
     let elementInput;
     const newElement = document.createElement(`${elementType}`);
 
-    if(name === 'status') {
-        taskDiv = task.querySelector(`select[name=${name}]`).parentElement; 
-        elementInput = taskDiv.querySelector('select');
-        newElement.classList.add(`status-${elementInput.value.toLowerCase().replace(/\s/g, '-')}`);
-    } else {
-        taskDiv = task.querySelector(`input[name=${name}]`).parentElement;
-        elementInput = taskDiv.querySelector('input');
-    }
+    if(name === 'description') {
+        inputDiv = task.querySelector(`input[name=${name}]`).parentElement;
+        console.log('inputDiv: ',inputDiv);
+        
+        const wrapperDiv = document.createElement('div');
+        wrapperDiv.classList.add(`task-${name}`); // puedes usar esta clase para estilos
+        elementInput = inputDiv.querySelector('input');
 
-    
-    newElement.textContent = elementInput.value;
-    newElement.classList.add(`task-${name}`);
-    taskDiv.replaceWith(newElement);
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = 'Description:';
+        labelSpan.style.fontWeight = 'bold'; // opcional, o usa una clase CSS
+
+        const contentSpan = document.createElement('span');
+        contentSpan.textContent = ` ${elementInput.value}`; // el contenido real
+
+        wrapperDiv.appendChild(labelSpan);
+        wrapperDiv.appendChild(contentSpan);
+        inputDiv.replaceWith(wrapperDiv);
+
+    } else {
+        if(name === 'status') {
+            inputDiv = task.querySelector(`select[name=${name}]`).parentElement; 
+            elementInput = inputDiv.querySelector('select');
+            newElement.classList.add(`status-${elementInput.value.toLowerCase().replace(/\s/g, '-')}`);
+        } else {
+            inputDiv = task.querySelector(`input[name=${name}]`).parentElement;
+            elementInput = inputDiv.querySelector('input');
+            
+        }
+        
+        newElement.textContent = elementInput.value;
+        newElement.classList.add(`task-${name}`);
+        inputDiv.replaceWith(newElement);
+    }
 
     return elementInput;
 }

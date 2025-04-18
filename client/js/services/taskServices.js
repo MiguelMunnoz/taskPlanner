@@ -1,5 +1,5 @@
 const BASE_URL = 'http://localhost:3000/tasks';
-let taskID = 0;
+let TASK_ID = 0;
 
 export async function getTasks() {
     try {
@@ -19,12 +19,12 @@ export async function createTask(title, desc, date, time, status) {
         time,
         status
     };
-
-    taskID += 1;
-    postData.taskID = taskID;
-
+    
     try {
         let tasks = JSON.parse(localStorage.getItem('Tasks'));
+        TASK_ID = generateTaskID(tasks);
+        postData.taskID = TASK_ID;
+        
         if(tasks) {
             tasks.push(postData);    
         } else {
@@ -71,7 +71,8 @@ export async function updateTask(id, updatedData) {
             if (task.taskID == id.textContent) {
                 updatedTask = updatedData;
                 updatedTask.taskID = task.taskID;
-                return updatedTask; // Cambias lo que necesites
+                console.log('ID de la task que estoy actualizando: ', task.taskID);
+                return updatedTask; 
             }
             
             return task;
@@ -89,4 +90,19 @@ export async function updateTask(id, updatedData) {
     } catch (error) {
         console.error('[ERROR] Error updating the task request . ', error);
     }
+}
+
+function generateTaskID(tasks) {
+    let newID = 1;
+
+    if(tasks) {
+        newID = tasks.length + 1;
+        tasks.forEach(task => {
+            if(newID == task.taskID) {
+                newID++;
+            }
+        });
+    }
+
+    return newID;
 }

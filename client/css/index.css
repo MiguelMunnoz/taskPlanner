@@ -176,6 +176,7 @@ body {
     border: 2px solid white;
     border-radius: 8px;
     color: white;
+    width: 50%;
 }
 
 .task-status {
