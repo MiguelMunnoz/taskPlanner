@@ -1,5 +1,6 @@
 import { getTasks, createTask, deleteTask, updateTask } from './services/taskServices.js';
 import { getWeather } from './services/weatherServices.js';
+import { getBoards, getLists, createBoard, createList, createCard } from './services/trelloServices.js';
 
 const createButton = document.querySelector('#create-task-button');
 const statusFilter = document.querySelector('#status-filter');
@@ -30,10 +31,6 @@ document.addEventListener('click', async (event) => {
         deleteHTMLTask(event);
     } else if (event.target.classList.contains('edit-task-button')) {
         editHTMLTask(event);
-    } else if (event.target.classList.contains('weather-info')) {
-        console.log('Click detectado');
-        const response = await getWeather('Madrid');
-        console.log(response);
     }
 });
 
@@ -51,15 +48,17 @@ createButton.addEventListener('click', async () => {
     try {
         const response = await createTask(title.value, description.value, date.value, time.value, status.value);
         console.log('Client response: ', response);
-
+        
         if(response) {
-            cleanForm(title, description, date, time, status);
+            await createTrelloCard(title.value, description.value, date.value, time.value, status.value);
+            //cleanForm(title, description, date, time, status);
             paintHTMLTasks(getAndFilterTasks(statusFilter.value));
         }
 
     } catch (error) {
         console.error('[ERROR] Error creating task. ', error);
     }
+
 });
 
 function getAndFilterTasks(filter) {
@@ -303,15 +302,15 @@ function deleteEditInput(task, name, elementType) {
         console.log('inputDiv: ',inputDiv);
         
         const wrapperDiv = document.createElement('div');
-        wrapperDiv.classList.add(`task-${name}`); // puedes usar esta clase para estilos
+        wrapperDiv.classList.add(`task-${name}`); 
         elementInput = inputDiv.querySelector('input');
 
         const labelSpan = document.createElement('span');
         labelSpan.textContent = 'Description:';
-        labelSpan.style.fontWeight = 'bold'; // opcional, o usa una clase CSS
+        labelSpan.style.fontWeight = 'bold'; 
 
         const contentSpan = document.createElement('span');
-        contentSpan.textContent = ` ${elementInput.value}`; // el contenido real
+        contentSpan.textContent = ` ${elementInput.value}`;
 
         wrapperDiv.appendChild(labelSpan);
         wrapperDiv.appendChild(contentSpan);
@@ -353,4 +352,25 @@ function paintWeatherInfo(weatherContainer, temp, desc, icon) {
 
     weatherContainer.appendChild(iconImg);
     weatherContainer.appendChild(weatherText);
+}
+
+async function createTrelloCard(title, description, date, time, status) {
+    const boards = await getBoards();
+    let board = boards.find(b => b.name.toLowerCase() === 'taskapi');
+
+    //Creamos el tablero si no existe
+    if (!board) {
+        console.log('Creando tablero inexistente TaskAPI.');
+        board = await createBoard('taskAPI');
+    } 
+    
+    //Creamos una lista si no existe
+    let lists = await getLists(board.id);
+    if(lists.length === 0) {
+        lists = [await createList(board.id, 'Info TaskAPI')];
+    }
+    const targetList = lists[0];
+
+    //Creamos la tarjeta en Trello
+    await createCard(targetList.id, title, `Description: ${description}%0A Date: ${date} ${time}h%0A Status: ${status}`);
 }

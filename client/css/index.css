@@ -216,6 +216,11 @@ body {
     background-color: #2ecc71;
 }
 
+.editing {
+    outline: 2px dashed #ffc107;
+    background-color: #fffbe6;
+}
+
 .fade-out {
     opacity: 0;
     transform: scale(0.9);
