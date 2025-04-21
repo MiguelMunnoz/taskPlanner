@@ -420,12 +420,9 @@ async function updateTrelloCard(taskID, updateData) {
 }
 
 async function deleteTrelloCard(taskID) {
-    console.log(taskID.textContent);
     const tasks = JSON.parse(localStorage.getItem('Tasks'));
-    console.log('Tareas guardadas: ', tasks);
-    console.log('Id de la primera tarea: ', tasks[0].taskID);
     const currentTask = tasks.find(t => t.taskID == taskID.textContent);
-    console.log(currentTask);
+
 
     if (!currentTask || !currentTask.trelloID) {
         console.error('[ERROR] Trello ID is incorrect or does not exist.');
@@ -433,5 +430,4 @@ async function deleteTrelloCard(taskID) {
     }
   
     const response = await deleteCard(currentTask.trelloID);
-    console.log(response);
 }
