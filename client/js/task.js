@@ -44,6 +44,22 @@ createButton.addEventListener('click', async () => {
     const time = document.querySelector('#time-input');
     const status = document.querySelector('#status-input');
 
+    //Validaciones
+    if (!title.value) {
+        alert("❗ El título es obligatorio.");
+        return;
+    }
+
+    if (!date.value || isNaN(Date.parse(date.value))) {
+        alert("❗ Debes introducir una fecha válida.");
+        return;
+    }
+
+    if (!time.value || !/^\d{2}:\d{2}$/.test(time.value)) {
+        alert("❗ Debes introducir una hora válida (formato HH:MM).");
+        return;
+    }
+
     try {
         const newCardID = await createTrelloCard(title.value, description.value, date.value, time.value, status.value);
         const response = await createTask(title.value, description.value, date.value, time.value, status.value, newCardID);
@@ -124,11 +140,13 @@ function createHTMLTask(id, taskValues) {
                     break;
                 case 2:
                     newElement.classList.add('task-date');
-                    newElement.textContent = taskElement;
+                    newElement.textContent = `📅 ${taskElement}`;
+                    //newElement.textContent = taskElement;
                     break;
                 case 3:
                     newElement.classList.add('task-time');
-                    newElement.textContent = taskElement;
+                    newElement.textContent = `⏰ ${taskElement}`;
+                    //newElement.textContent = taskElement;
                     break;
                 case 4:
                     const wrapperDiv = document.createElement('div');
@@ -279,9 +297,13 @@ function createEditInput(labelText, inputType, elementHTML){
         if(labelText.toLowerCase() === 'description') {
             const descContent = elementHTML.lastChild;
             inputElement.value = descContent.textContent;
+        } else if(labelText.toLowerCase() === 'date') {
+            inputElement.value = elementHTML.textContent.replace(/^📅\s*/, '');
+        } else if(labelText.toLowerCase() === 'time') {
+            inputElement.value = elementHTML.textContent.replace(/^⏰\s*/, '');
         } else {
             inputElement.value = elementHTML.textContent;
-        }
+        }          
     }
 
     //Añadimos etiquetas y envolvemos cada elemento en un div
@@ -326,10 +348,16 @@ function deleteEditInput(task, name, elementType) {
         } else {
             inputDiv = task.querySelector(`input[name=${name}]`).parentElement;
             elementInput = inputDiv.querySelector('input');
-            
         }
         
-        newElement.textContent = elementInput.value;
+        if(name === 'date') {
+            newElement.textContent = `📅  ${elementInput.value}`;
+        } else if(name === 'time') {
+            newElement.textContent = `⏰ ${elementInput.value}`;
+        } else {
+            newElement.textContent = elementInput.value;
+        }
+
         newElement.classList.add(`task-${name}`);
         inputDiv.replaceWith(newElement);
     }

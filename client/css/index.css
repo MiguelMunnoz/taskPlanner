@@ -184,11 +184,19 @@ body {
 }
 
 .task-description {
+    margin-top: 10px;
     padding: 5px;
     border: 2px solid white;
     border-radius: 8px;
     color: white;
-    width: 50%;
+    width: fit-content;
+}
+
+.task-date, .task-time {
+    border: 2px solid white;
+    border-radius: 8px;
+    width: fit-content;
+    padding: 5px;
 }
 
 .task-status {
