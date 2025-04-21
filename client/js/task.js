@@ -47,7 +47,7 @@ function getAndFilterTasks(filter) {
     const tasks = JSON.parse(localStorage.getItem('Tasks'));
 
     if(tasks) {
-        const filteredTasks = tasks.filter(task => (task.status === filter || filter === 'all'));
+        const filteredTasks = tasks.filter(task => (task.status.toLowerCase() === filter.toLowerCase() || filter === 'all'));
         return filteredTasks;
     } else {
         return [];
