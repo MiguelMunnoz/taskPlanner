@@ -1,6 +1,6 @@
 import { getTasks, createTask, deleteTask, updateTask } from './services/taskServices.js';
 import { getWeather } from './services/weatherServices.js';
-import { getBoards, getLists, createBoard, createList, createCard, updateCard } from './services/trelloServices.js';
+import { getBoards, getLists, createBoard, createList, createCard, updateCard, deleteCard } from './services/trelloServices.js';
 
 const createButton = document.querySelector('#create-task-button');
 const statusFilter = document.querySelector('#status-filter');
@@ -177,8 +177,10 @@ async function deleteHTMLTask(event) {
     }
 
     try {
+        await deleteTrelloCard(id);
         const response = await deleteTask(id);
         console.log('Client response: ', response);
+
         removeTaskDiv(parentDiv);
     } catch (error) {
         console.error('[ERROR] Error deleting task. ', error);
@@ -379,7 +381,7 @@ async function updateTrelloCard(taskID, updateData) {
     const currentTask = tasks.find(t => t.taskID == taskID);
 
     if (!currentTask || !currentTask.trelloID) {
-      console.error(' [ERROR] Trello ID does not exist.');
+      console.error('[ERROR] Trello ID is incorrect or does not exist.');
       return;
     }
   
@@ -387,4 +389,21 @@ async function updateTrelloCard(taskID, updateData) {
     const formattedDesc = `**Description:** ${description}%0A **Date:** ${date}   ${time}h%0A **Status:** ${status}`;
   
     await updateCard(currentTask.trelloID, title, formattedDesc);
-  }
+}
+
+async function deleteTrelloCard(taskID) {
+    console.log(taskID.textContent);
+    const tasks = JSON.parse(localStorage.getItem('Tasks'));
+    console.log('Tareas guardadas: ', tasks);
+    console.log('Id de la primera tarea: ', tasks[0].taskID);
+    const currentTask = tasks.find(t => t.taskID == taskID.textContent);
+    console.log(currentTask);
+
+    if (!currentTask || !currentTask.trelloID) {
+        console.error('[ERROR] Trello ID is incorrect or does not exist.');
+        return;
+    }
+  
+    const response = await deleteCard(currentTask.trelloID);
+    console.log(response);
+}

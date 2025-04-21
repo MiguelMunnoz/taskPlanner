@@ -104,4 +104,21 @@ export async function updateCard(trelloCardId, newTitle, newDescription) {
         console.error('[ERROR] Error updating card in Trello.', error);
         return null;
     }
-  }
+}
+
+export async function deleteCard(trelloCardId) {
+    const url = `https://api.trello.com/1/cards/${trelloCardId}?key=${API_KEY}&token=${API_TOKEN}`;
+  
+    try {
+        const response = await fetch(url, { method: 'DELETE' });
+        if (!response.ok) {
+            throw new Error('Error: ', response.status);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('[ERROR] Error deleting card in Trello.', error);
+        return null;
+    }
+}
