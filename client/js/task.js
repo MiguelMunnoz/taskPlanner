@@ -1,13 +1,12 @@
 import { getTasks, createTask, deleteTask, updateTask } from './services/taskServices.js';
 import { getWeather } from './services/weatherServices.js';
-import { getBoards, getLists, createBoard, createList, createCard } from './services/trelloServices.js';
+import { getBoards, getLists, createBoard, createList, createCard, updateCard } from './services/trelloServices.js';
 
 const createButton = document.querySelector('#create-task-button');
 const statusFilter = document.querySelector('#status-filter');
 
 document.addEventListener('DOMContentLoaded', async () => {
     paintHTMLTasks(getAndFilterTasks(statusFilter.value));
-
     const response = await getTasks();
     console.log('Client response: ', response);
 
@@ -46,12 +45,12 @@ createButton.addEventListener('click', async () => {
     const status = document.querySelector('#status-input');
 
     try {
-        const response = await createTask(title.value, description.value, date.value, time.value, status.value);
+        const newCardID = await createTrelloCard(title.value, description.value, date.value, time.value, status.value);
+        const response = await createTask(title.value, description.value, date.value, time.value, status.value, newCardID);
         console.log('Client response: ', response);
         
         if(response) {
-            await createTrelloCard(title.value, description.value, date.value, time.value, status.value);
-            //cleanForm(title, description, date, time, status);
+            cleanForm(title, description, date, time, status);
             paintHTMLTasks(getAndFilterTasks(statusFilter.value));
         }
 
@@ -230,7 +229,8 @@ async function editHTMLTask(event) {
             time: timeInput.value, 
             status: statusInput.value
         };
-        
+
+        await updateTrelloCard(task.querySelector('span').textContent, updateData);
         const response = await updateTask(task.querySelector('span'), updateData);
         console.log('Client response: ', response);
         
@@ -247,7 +247,7 @@ async function editHTMLTask(event) {
     
         task.classList.add('editing');
         event.target.textContent = '💾';
-      }
+    }
 }
 
 function createEditInput(labelText, inputType, elementHTML){
@@ -275,7 +275,7 @@ function createEditInput(labelText, inputType, elementHTML){
         inputElement.name = labelText.toLowerCase();
 
         if(labelText.toLowerCase() === 'description') {
-            const descContent = elementHTML.nextElementSibling;
+            const descContent = elementHTML.lastChild;
             inputElement.value = descContent.textContent;
         } else {
             inputElement.value = elementHTML.textContent;
@@ -299,7 +299,6 @@ function deleteEditInput(task, name, elementType) {
 
     if(name === 'description') {
         inputDiv = task.querySelector(`input[name=${name}]`).parentElement;
-        console.log('inputDiv: ',inputDiv);
         
         const wrapperDiv = document.createElement('div');
         wrapperDiv.classList.add(`task-${name}`); 
@@ -360,7 +359,6 @@ async function createTrelloCard(title, description, date, time, status) {
 
     //Creamos el tablero si no existe
     if (!board) {
-        console.log('Creando tablero inexistente TaskAPI.');
         board = await createBoard('taskAPI');
     } 
     
@@ -372,5 +370,21 @@ async function createTrelloCard(title, description, date, time, status) {
     const targetList = lists[0];
 
     //Creamos la tarjeta en Trello
-    await createCard(targetList.id, title, `Description: ${description}%0A Date: ${date} ${time}h%0A Status: ${status}`);
+    const response = await createCard(targetList.id, title, `**Description:** ${description}%0A **Date:** ${date}   ${time}h%0A **Status:** ${status}`);
+    return response.id;
 }
+
+async function updateTrelloCard(taskID, updateData) {
+    const tasks = JSON.parse(localStorage.getItem('Tasks'));
+    const currentTask = tasks.find(t => t.taskID == taskID);
+
+    if (!currentTask || !currentTask.trelloID) {
+      console.error(' [ERROR] Trello ID does not exist.');
+      return;
+    }
+  
+    const { title, description, date, time, status } = updateData;
+    const formattedDesc = `**Description:** ${description}%0A **Date:** ${date}   ${time}h%0A **Status:** ${status}`;
+  
+    await updateCard(currentTask.trelloID, title, formattedDesc);
+  }

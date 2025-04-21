@@ -14,7 +14,7 @@ export async function getBoards() {
         return data;
 
     } catch(error) {
-        console.error('[ERROR] gettig boards. ', error);
+        console.error('[ERROR] gettig boards in Trello. ', error);
         return null;
     }
 }
@@ -32,7 +32,7 @@ export async function getLists(boardId) {
         return data;
 
     } catch (error) {
-        console.error("[ERROR] Error getting Trello's list. ", error);
+        console.error("[ERROR] Error getting lists in Trello. ", error);
         return null;
     }   
 }
@@ -67,14 +67,14 @@ export async function createList(boardId, listName) {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error('[ERROR] Error creating board in Trello. ', error);
+        console.error('[ERROR] Error creating list in Trello. ', error);
         return null
     }
 }
   
 export async function createCard(listId, name, desc) {
     const url = `https://api.trello.com/1/cards?key=${API_KEY}&token=${API_TOKEN}&idList=${listId}&name=${name}&desc=${desc}`;
-    console.log(url);
+
     try {
         const response = await fetch(url, { method: 'POST' });
         if (!response.ok) {
@@ -88,3 +88,20 @@ export async function createCard(listId, name, desc) {
         return null;
     }
 }
+
+export async function updateCard(trelloCardId, newTitle, newDescription) {
+    const url = `https://api.trello.com/1/cards/${trelloCardId}?key=${API_KEY}&token=${API_TOKEN}&name=${newTitle}&desc=${newDescription}`;
+  
+    try {
+        const response = await fetch(url, { method: 'PUT' });
+        if (!response.ok) {
+            throw new Error('Error: ', response.status);
+        } 
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('[ERROR] Error updating card in Trello.', error);
+        return null;
+    }
+  }

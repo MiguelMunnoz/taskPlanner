@@ -11,13 +11,14 @@ export async function getTasks() {
     }
 }
 
-export async function createTask(title, desc, date, time, status) {
+export async function createTask(title, desc, date, time, status, trelloID) {
     const postData = {
         title,
         description: desc,
         date,
         time,
-        status
+        status,
+        trelloID
     };
     
     try {
@@ -71,7 +72,7 @@ export async function updateTask(id, updatedData) {
             if (task.taskID == id.textContent) {
                 updatedTask = updatedData;
                 updatedTask.taskID = task.taskID;
-                console.log('ID de la task que estoy actualizando: ', task.taskID);
+                updatedTask.trelloID = task.trelloID;
                 return updatedTask; 
             }
             
