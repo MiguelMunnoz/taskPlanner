@@ -1,4 +1,5 @@
 import { getTasks, createTask, deleteTask, updateTask } from './services/taskServices.js';
+import { getWeather } from './services/weatherServices.js';
 
 const createButton = document.querySelector('#create-task-button');
 const statusFilter = document.querySelector('#status-filter');
@@ -8,6 +9,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const response = await getTasks();
     console.log('Client response: ', response);
+
+    // Obtener y mostrar el clima
+    const weatherData = await getWeather('Madrid');
+    const weatherContainer = document.querySelector('#weather-container');
+
+    if (weatherData) {
+        const temp = weatherData.main.temp;
+        const desc = weatherData.weather[0].description;
+        const icon = weatherData.weather[0].icon;
+        paintWeatherInfo(weatherContainer, temp, desc, icon);
+
+    } else {
+        weatherContainer.textContent = 'No se pudo cargar el clima 😓';
+    }
 });
 
 document.addEventListener('click', async (event) => {
@@ -15,6 +30,10 @@ document.addEventListener('click', async (event) => {
         deleteHTMLTask(event);
     } else if (event.target.classList.contains('edit-task-button')) {
         editHTMLTask(event);
+    } else if (event.target.classList.contains('weather-info')) {
+        console.log('Click detectado');
+        const response = await getWeather('Madrid');
+        console.log(response);
     }
 });
 
@@ -126,7 +145,6 @@ function createHTMLTask(id, taskValues) {
 
                     wrapperDiv.appendChild(labelSpan);
                     wrapperDiv.appendChild(contentSpan);
-                    console.log(wrapperDiv);
                     newDiv.appendChild(wrapperDiv);
                     break;
             }
@@ -300,6 +318,7 @@ function deleteEditInput(task, name, elementType) {
         inputDiv.replaceWith(wrapperDiv);
 
     } else {
+
         if(name === 'status') {
             inputDiv = task.querySelector(`select[name=${name}]`).parentElement; 
             elementInput = inputDiv.querySelector('select');
@@ -316,4 +335,22 @@ function deleteEditInput(task, name, elementType) {
     }
 
     return elementInput;
+}
+
+function paintWeatherInfo(weatherContainer, temp, desc, icon) {
+    weatherContainer.replaceChildren();
+
+    //Imagen
+    const iconImg = document.createElement('img');
+    iconImg.src = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+    iconImg.alt = desc;
+    iconImg.style.verticalAlign = 'middle';
+
+    //Info
+    const weatherText = document.createElement('span');
+    weatherText.textContent = `🌡️ ${Math.round(temp)}°C - ${desc.charAt(0).toUpperCase() + desc.slice(1)}`;
+    weatherText.style.marginLeft = '8px';
+
+    weatherContainer.appendChild(iconImg);
+    weatherContainer.appendChild(weatherText);
 }

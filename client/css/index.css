@@ -5,13 +5,14 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: #d0e9ff;
 }
 
 .main {
     display: flex;
     flex-direction: row;
     gap: 10px;
-    background-color: #e9f1fa;
+    background-color: #d0e9ff;
     padding: 3px;
     width: 100%;
     align-items: flex-start; /* Añadido */
@@ -21,10 +22,19 @@ body {
     background-color: #2980b9;
     border: 2px solid black;
     border-radius: 8px;
-    width: 300px; /* Mejor usar píxeles fijos */
+    width: 320px; /* Mejor usar píxeles fijos */
     padding: 5px;
     flex-shrink: 0; /* Impide que se reduzca si el contenido de al lado crece */
-  }
+}
+
+.sidebar h3 {
+    width: 100%;
+    max-width: 300px;
+    padding: 5px;
+    border: 2px solid black;
+    border-radius: 8px;
+    text-align: center;
+}
 
 .taskForm {
     display: flex;
@@ -32,19 +42,10 @@ body {
     align-items: center;
     gap: 10px;
 
-    background-color: #e9f1fa;
-    border: 2px solid #e9f1fa;
+    background-color: #d0e9ff;
+    border: 2px solid #d0e9ff;
     border-radius: 8px;
     padding: 10px;
-}
-  
-.taskForm h3 {
-    width: 100%;
-    max-width: 300px;
-    padding: 5px;
-    border: 2px solid black;
-    border-radius: 8px;
-    text-align: center;
 }
   
 .input-div {
@@ -94,6 +95,17 @@ body {
     background-color: #00abe4;
 }
 
+.weather-info {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #d0e9ff;
+    font-weight: bold;
+    text-align: center;
+    color: #004a75;
+    font-size: 0.95rem;
+}
+
 .hidden {
     display: none;
     visibility: hidden;
@@ -132,8 +144,8 @@ body {
     align-items: center;
     gap: 10px;
 
-    background-color: #e9f1fa;
-    border: 2px solid #e9f1fa;
+    background-color: #d0e9ff;
+    border: 2px solid #d0e9ff;
     border-radius: 8px;
     padding: 5px;
     margin-top: 5px;
